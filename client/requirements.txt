@@ -1,19 +1,10 @@
 # requirements for development
-cryptography>=35.0.0
-toml
 grpcio
 grpcio-tools
-bitstring
-cbor2
 pybind11
 setuptools
 wheel
-patchelf
 check-wheel-contents
 auditwheel
-pillow
 cibuildwheel
-numpy
-torch
-transformers
-
+delvewheel==0.0.20

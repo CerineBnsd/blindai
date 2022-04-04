@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find . -name "pybind*.so" | xargs -l1 -t patchelf --set-rpath "\$ORIGIN/blindai/lib"
+find . -name "_quote_verification*.so" | xargs -l1 -t patchelf --set-rpath "\$ORIGIN/blindai/lib"

@@ -28,8 +28,11 @@ cmake_minimum_required(VERSION 3.10)
 
 project(AttestationCommons CXX)
 
-hunter_add_package(OpenSSL)
-find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+if(NOT WIN32)
+        
+        hunter_add_package(OpenSSL)
+        find_package(OpenSSL 1.1.1 EXACT REQUIRED) 
+endif()
 
 file(GLOB SOURCE_FILES src/*.cpp
         src/Utils/*.cpp
@@ -47,15 +50,30 @@ include_directories(
         include/Utils
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-        OpenSSL::SSL
-        OpenSSL::Crypto
-)
+if(WIN32)
+        include_directories(
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/include
+        )
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libssl.lib
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libcrypto.lib
+        )
 
-target_link_libraries(${PROJECT_NAME}Static PUBLIC
-        OpenSSL::SSL
-        OpenSSL::Crypto
-)
+        target_link_libraries(${PROJECT_NAME}Static PUBLIC
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libssl.lib
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libcrypto.lib
+        )
+else()
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+                OpenSSL::SSL
+                OpenSSL::Crypto
+        )
+
+        target_link_libraries(${PROJECT_NAME}Static PUBLIC
+                OpenSSL::SSL
+                OpenSSL::Crypto
+        )
+endif()
 
 ######### QVL Enclave related settings #################################################################################
 

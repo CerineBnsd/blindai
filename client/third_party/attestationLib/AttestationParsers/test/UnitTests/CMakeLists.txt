@@ -28,8 +28,11 @@ cmake_minimum_required(VERSION 3.10)
 
 set(SUBPROJECT_NAME ${PROJECT_NAME}_UT)
 
-hunter_add_package(OpenSSL)
-find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+if(NOT WIN32)
+    
+    hunter_add_package(OpenSSL)
+    find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+endif()
 
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)

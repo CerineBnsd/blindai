@@ -49,8 +49,11 @@ if(BUILD_DOCS)
     install(DIRECTORY ${DOXYGEN_BUILD_DIR}/ DESTINATION doc)
 endif()
 
-hunter_add_package(OpenSSL)
-find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+if(NOT WIN32)
+        
+        hunter_add_package(OpenSSL)
+        find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+endif()
 
 file(GLOB SOURCE_FILES src/*.cpp
         src/Json/*.cpp
@@ -70,20 +73,36 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src
         ${ATTESTATION_COMMONS_API_INCLUDE}
 )
+if(WIN32)
+        include_directories(
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/include
+                )
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+                AttestationCommonsStatic
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libssl.lib
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libcrypto.lib
+                rapidjson
+                )
+        target_link_libraries(${PROJECT_NAME}Static PUBLIC
+                AttestationCommonsStatic
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libssl.lib
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libcrypto.lib
+                rapidjson
+                )        
+else()
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+                AttestationCommonsStatic
+                OpenSSL::SSL
+                OpenSSL::Crypto
+                )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-        AttestationCommonsStatic
-        OpenSSL::SSL
-        OpenSSL::Crypto
-        rapidjson
-        )
-
-target_link_libraries(${PROJECT_NAME}Static PUBLIC
-        AttestationCommonsStatic
-        OpenSSL::SSL
-        OpenSSL::Crypto
-        rapidjson
-        )
+        target_link_libraries(${PROJECT_NAME}Static PUBLIC
+                AttestationCommonsStatic
+                OpenSSL::SSL
+                OpenSSL::Crypto
+                rapidjson
+                )
+endif()
 
 ######### QVL Enclave related settings #################################################################################
 

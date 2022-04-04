@@ -28,7 +28,11 @@ project(ThirdParty)
 
 include(ExternalProject)
 
-hunter_add_package(OpenSSL)
+if(NOT WIN32)
+    message("We are here")
+    hunter_add_package(OpenSSL)
+endif()
+
 hunter_add_package(GTest)
 
 add_library(rapidjson INTERFACE)

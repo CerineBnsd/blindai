@@ -48,9 +48,11 @@ if(BUILD_DOCS)
 
     install(DIRECTORY ${DOXYGEN_BUILD_DIR}/ DESTINATION doc)
 endif()
-
-hunter_add_package(OpenSSL)
-find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+if(NOT WIN32)
+        
+        hunter_add_package(OpenSSL)
+        find_package(OpenSSL 1.1.1 EXACT REQUIRED) 
+endif()
 
 file(GLOB SOURCE_FILES src/*.cpp
         src/OpensslHelpers/*.cpp
@@ -75,21 +77,41 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-        AttestationCommonsStatic
-        AttestationParsersStatic
-        rapidjson
-        OpenSSL::SSL
-        OpenSSL::Crypto
-        )
+if(WIN32)
+        include_directories(
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/include
+                )
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+                AttestationCommonsStatic
+                AttestationParsersStatic
+                rapidjson
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libssl.lib
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libcrypto.lib
+                )
+        target_link_libraries(${PROJECT_NAME}Static PUBLIC
+                AttestationCommonsStatic
+                AttestationParsersStatic
+                rapidjson
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libssl.lib
+                ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/openssl/lib/libcrypto.lib
+                )        
+else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+                AttestationCommonsStatic
+                AttestationParsersStatic
+                rapidjson
+                OpenSSL::SSL
+                OpenSSL::Crypto
+                )
 
-target_link_libraries(${PROJECT_NAME}Static PRIVATE
-        AttestationCommonsStatic
-        AttestationParsersStatic
-        rapidjson
-        OpenSSL::SSL
-        OpenSSL::Crypto
-        )
+        target_link_libraries(${PROJECT_NAME}Static PRIVATE
+                AttestationCommonsStatic
+                AttestationParsersStatic
+                rapidjson
+                OpenSSL::SSL
+                OpenSSL::Crypto
+                )
+endif()
 
 if(MSVC)
     target_compile_definitions(${PROJECT_NAME}Static PUBLIC ATTESTATIONLIBRARY_STATIC)
